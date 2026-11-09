@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>আমার ডেইলি প্ল্যানার</title>
+<style>
+:root{--bg:#f4f1ea;--card:#fff;--ink:#222;--mute:#777;--acc:#1f7a5c;--acc2:#e7f3ee;--line:#e2ddd0;--r1:#c0392b;--r2:#d98a1b;--r3:#2c6fb7}
+@media (prefers-color-scheme:dark){:root{--bg:#171a19;--card:#212625;--ink:#ece9e2;--mute:#9aa29e;--acc:#3fb88c;--acc2:#1d3a31;--line:#343b39}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Bengali","Kalpurush","SolaimanLipi",system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:860px;margin:0 auto;padding:12px 14px 60px}
+h1{font-size:1.5rem;margin:8px 0;text-align:center}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.card h2{font-size:1.05rem;margin:0 0 10px;color:var(--acc)}
+[contenteditable]{outline:none;border-bottom:1px dashed transparent;min-width:1em;display:inline-block}
+[contenteditable]:hover,[contenteditable]:focus{border-bottom-color:var(--acc)}
+.datebar{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.datebar .big{font-size:1.15rem;font-weight:700;min-width:210px;text-align:center}
+button,input,textarea{font:inherit;color:inherit}
+button{background:var(--acc2);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--acc)}
+input[type=date],input[type=time],input[type=number],input[type=text],textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+textarea{width:100%;min-height:64px;resize:vertical}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px}
+.week button{padding:6px 2px;font-size:.85rem;text-align:center}
+.week button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.prayers{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+.row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.row:last-child{border-bottom:0}
+.row .grow{flex:1;min-width:120px}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--acc)}
+.task{display:grid;grid-template-columns:auto auto 1fr;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.task:last-child{border-bottom:0}
+.task .n{font-weight:700;width:26px;text-align:center}
+.task .times{grid-column:3;display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:.85rem;color:var(--mute)}
+.task input[type=text]{width:100%}
+.g1 .n{color:var(--r1)}.g2 .n{color:var(--r2)}.g3 .n{color:var(--r3)}
+.gt{font-weight:700;margin:12px 0 2px}
+.g1 .gt{color:var(--r1)}.g2 .gt{color:var(--r2)}.g3 .gt{color:var(--r3)}
+.notes label{display:block;font-weight:600;margin:10px 0 4px}
+.score{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+.score button{padding:8px 0}
+.score button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.bar{height:16px;background:var(--bg);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .3s}
+.small{color:var(--mute);font-size:.85rem}
+.del{color:#c0392b;background:transparent;border:0;padding:2px 8px;font-size:1.1rem}
+.tools{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.tabs{display:flex;gap:6px;justify-content:center;margin:8px 0}
+.tabs button{flex:1;max-width:160px;font-weight:600}
+.tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.blab{display:block;font-weight:600;margin:10px 0 4px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:12px}
+.tile{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
+.tile b{display:block;font-size:1.25rem;color:var(--acc)}
+.tile span{font-size:.8rem;color:var(--mute)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:8px 0}
+.cal .wd{text-align:center;font-size:.8rem;color:var(--mute)}
+.cell{aspect-ratio:1;padding:0;display:flex;align-items:center;justify-content:center;border-radius:8px;background:color-mix(in srgb,var(--acc) calc(var(--p)*1%),var(--bg))}
+.cell.empty{background:var(--bg);color:var(--mute)}
+.cell.blank{visibility:hidden}
+.cell.today{outline:2px solid var(--acc)}
+.orow{display:flex;align-items:center;gap:8px;margin:6px 0}
+.orow .ol{width:110px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.orow .bar{flex:1;height:12px}
+.link{background:transparent;border:0;padding:0;text-align:left;cursor:pointer;color:var(--ink)}
+.h3{font-weight:700;margin:14px 0 4px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+const KEY = 'bn-planner-v1';
+const PRAYERS = [['f','ফজর'],['j','জোহর'],['a','আসর'],['m','মাগরিব'],['e','এশা'],['t','তাহাজ্জুদ']];
+const GROUPS = [
+  {id:'g1', title:'সবচেয়ে গুরুত্বপূর্ণ', from:1, to:2},
+  {id:'g2', title:'খুব গুরুত্বপূর্ণ', from:3, to:5},
+  {id:'g3', title:'গুরুত্বপূর্ণ', from:6, to:14}
+];
+const NOTES = [
+  ['appt','অ্যাপয়েন্টমেন্ট'],['call','ফোন কল'],['mail','ইমেইল'],
+  ['promise','আজকের প্রতিশ্রুতি'],['urgent','জরুরি নোট'],
+  ['ach','Achievement'],['exp','আজকের অভিজ্ঞতা']
+];
+const DEFAULT_HABITS = [
+  {id:'h1', name:'হালাল বিনোদন'},
+  {id:'h2', name:'বই পড়া', pages:true},
+  {id:'h3', name:'কুরআন তিলাওয়াত'},
+  {id:'h4', name:'পানি পান'}
+];
+
+let state = load();
+let cur = new Date(); cur.setHours(0,0,0,0);
+let view = state.cfg.view || 'day';
+
+function load(){
+  try{
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if(s && s.cfg && s.days){ s.months ??= {}; s.years ??= {}; return s; }
+  }catch(e){}
+  return {cfg:{labels:{}, habits:JSON.parse(JSON.stringify(DEFAULT_HABITS))}, days:{}, months:{}, years:{}};
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function bn(n){ return Number(n).toLocaleString('bn-BD',{useGrouping:false}); }
+function key(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function fromKey(k){ const [y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d); }
+function lab(k, def){ return esc(state.cfg.labels[k] ?? def); }
+function ed(k, def, tag='span'){ return `<${tag} contenteditable="true" spellcheck="false" data-label="${k}" data-def="${esc(def)}">${lab(k,def)}</${tag}>`; }
+
+function day(){
+  const k = key(cur);
+  if(!state.days[k]) state.days[k] = {};
+  const d = state.days[k];
+  d.pr ??= {}; d.hb ??= {}; d.pages ??= {}; d.notes ??= {};
+  d.exMin ??= ''; d.ex ??= false; d.score ??= 0;
+  if(!Array.isArray(d.tasks)) d.tasks = [];
+  while(d.tasks.length < 14) d.tasks.push({t:'',from:'',to:'',d:false});
+  return d;
+}
+function setPath(obj, path, val){
+  const p = path.split('.'); let o = obj;
+  for(let i=0;i<p.length-1;i++){ o = o[p[i]]; }
+  o[p[p.length-1]] = val;
+}
+
+function render(){
+  if(view!=='day') return renderPeriod();
+  const d = day();
+  const full = new Intl.DateTimeFormat('bn-BD',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(cur);
+  const dow = (cur.getDay()+1)%7; // শনিবার = 0
+  const start = new Date(cur); start.setDate(cur.getDate()-dow);
+  let week = '';
+  for(let i=0;i<7;i++){
+    const x = new Date(start); x.setDate(start.getDate()+i);
+    const nm = new Intl.DateTimeFormat('bn-BD',{weekday:'short'}).format(x);
+    week += `<button class="${key(x)===key(cur)?'on':''}" data-go="${key(x)}">${nm}<br>${bn(x.getDate())}</button>`;
+  }
+
+  const prayers = PRAYERS.map(([id,def])=>`
+    <label class="chip"><input type="checkbox" data-path="pr.${id}" ${d.pr[id]?'checked':''}> ${ed('p_'+id,def)}</label>`).join('');
+
+  const habits = state.cfg.habits.map(h=>`
+    <div class="row">
+      <input type="checkbox" data-path="hb.${h.id}" ${d.hb[h.id]?'checked':''}>
+      <span class="grow"><span contenteditable="true" spellcheck="false" data-habit="${h.id}">${esc(h.name)}</span></span>
+      ${h.pages?`<span class="small">পৃষ্ঠা:</span><input type="number" min="0" style="width:80px" data-path="pages.${h.id}" value="${esc(d.pages[h.id]??'')}">`:''}
+      <button class="del" title="মুছুন" data-del="${h.id}">✕</button>
+    </div>`).join('');
+
+  const groups = GROUPS.map(g=>{
+    let rows='';
+    for(let n=g.from;n<=g.to;n++){
+      const t = d.tasks[n-1];
+      rows += `
+      <div class="task">
+        <span class="n">${bn(n)}</span>
+        <input type="checkbox" data-path="tasks.${n-1}.d" ${t.d?'checked':''}>
+        <input type="text" placeholder="কাজের নাম..." data-path="tasks.${n-1}.t" value="${esc(t.t)}">
+        <span class="times">থেকে <input type="time" data-path="tasks.${n-1}.from" value="${esc(t.from)}"> পর্যন্ত <input type="time" data-path="tasks.${n-1}.to" value="${esc(t.to)}"></span>
+      </div>`;
+    }
+    return `<div class="${g.id}"><div class="gt">${ed('gt_'+g.id,g.title)} (${bn(g.from)}–${bn(g.to)})</div>${rows}</div>`;
+  }).join('');
+
+  const notes = NOTES.map(([id,def])=>`
+    <label>${ed('n_'+id,def)}</label>
+    <textarea data-path="notes.${id}">${esc(d.notes[id]??'')}</textarea>`).join('');
+
+  let score='';
+  for(let i=1;i<=10;i++) score += `<button class="${d.score===i?'on':''}" data-score="${i}">${bn(i)}</button>`;
+
+  document.getElementById('app').innerHTML = `
+    <h1>${ed('title','আমার ডেইলি প্ল্যানার')}</h1>${tabs()}
+    <div class="card">
+      <div class="datebar">
+        <button data-step="-1">◀ আগের দিন</button>
+        <span class="big">${full}</span>
+        <button data-step="1">পরের দিন ▶</button>
+      </div>
+      <div class="datebar" style="margin-top:8px"><input type="date" id="picker" value="${key(cur)}"><button data-go="${key(new Date())}">আজ</button></div>
+      <div class="week">${week}</div>
+    </div>
+
+    <div class="card"><h2>${ed('h_pr','নামাজ')}</h2><div class="prayers">${prayers}</div></div>
+
+    <div class="card"><h2>${ed('h_ex','ব্যায়াম')}</h2>
+      <div class="row"><input type="checkbox" data-path="ex" ${d.ex?'checked':''}>
+      <span class="grow">${ed('l_ex','ব্যায়াম করেছি')}</span>
+      <span class="small">${ed('l_exm','সময় (মিনিট)')}:</span>
+      <input type="number" min="0" style="width:90px" data-path="exMin" value="${esc(d.exMin)}"></div>
+    </div>
+
+    <div class="card"><h2>${ed('h_hb','হ্যাবিট ট্র্যাক')}</h2>${habits}
+      <div style="margin-top:10px"><button id="addHabit">＋ নতুন হ্যাবিট</button>
+      <label class="small"><input type="checkbox" id="newPages"> পৃষ্ঠা সংখ্যার ঘর থাকবে</label></div>
+    </div>
+
+    <div class="card"><h2>${ed('h_tk','১৪টি কাজ')}</h2>${groups}</div>
+    <div class="card notes"><h2>${ed('h_nt','নোট')}</h2>${notes}</div>
+    <div class="card"><h2>${ed('h_sc','আজকের প্রোডাক্টিভ স্কোর (১–১০)')}</h2><div class="score">${score}</div></div>
+    <div class="card"><h2>${ed('h_pg','আজকের অগ্রগতি')}</h2>
+      <div class="bar"><i id="barFill"></i></div><div class="small" id="barText" style="margin-top:6px"></div></div>
+
+    <div class="card tools">
+      <button id="exp">⬇ ব্যাকআপ (JSON)</button>
+      <button id="imp">⬆ ব্যাকআপ লোড</button>
+      <button id="clr">আজকের দিন মুছুন</button>
+      <input type="file" id="file" accept=".json" hidden>
+    </div>
+    <p class="small" style="text-align:center">সব লেখা (শিরোনাম, হ্যাবিট, লেবেল সহ) ক্লিক করে বদলানো যায়। তথ্য এই ব্রাউজারেই সেভ হয়; ডিভাইস বদলাতে ব্যাকআপ ব্যবহার করুন।</p>`;
+  progress();
+}
+
+function progress(){
+  const d = day(); const hs = state.cfg.habits;
+  let total = PRAYERS.length + 1 + hs.length, done = 0;
+  PRAYERS.forEach(([id])=>{ if(d.pr[id]) done++; });
+  if(d.ex) done++;
+  hs.forEach(h=>{ if(d.hb[h.id]) done++; });
+  d.tasks.forEach(t=>{ if(t.t.trim()){ total++; if(t.d) done++; } });
+  const pct = total ? Math.round(done/total*100) : 0;
+  const f = document.getElementById('barFill'), t = document.getElementById('barText');
+  if(f){ f.style.width = pct+'%'; t.textContent = `${bn(done)} / ${bn(total)} সম্পন্ন (${bn(pct)}%)`; }
+}
+
+function setView(v){ view = v; state.cfg.view = v; save(); }
+function tabs(){
+  return `<div class="tabs">${[['day','দৈনিক'],['month','মাসিক'],['year','বার্ষিক']].map(([v,t])=>`<button class="${view===v?'on':''}" data-view="${v}">${t}</button>`).join('')}</div>`;
+}
+function mon(){ const k=key(cur).slice(0,7); const m=(state.months[k] ??= {}); m.goals??=[]; m.notes??=''; m.review??=''; return m; }
+function yr(){ const k=String(cur.getFullYear()); const y=(state.years[k] ??= {}); y.goals??=[]; y.notes??=''; y.review??=''; return y; }
+function target(sc){ return sc==='m' ? mon() : sc==='y' ? yr() : day(); }
+
+function goalsHTML(sc,o){
+  const done = o.goals.filter(g=>g.d).length;
+  const rows = o.goals.map((g,i)=>`
+    <div class="row">
+      <input type="checkbox" data-scope="${sc}" data-path="goals.${i}.d" ${g.d?'checked':''}>
+      <input type="text" class="grow" placeholder="লক্ষ্য লিখুন..." data-scope="${sc}" data-path="goals.${i}.t" value="${esc(g.t)}">
+      <button class="del" title="মুছুন" data-delgoal="${sc}:${i}">✕</button>
+    </div>`).join('');
+  return `<div class="h3">${ed('gl_'+sc,'লক্ষ্যসমূহ')}</div>${rows}
+    <div style="margin-top:10px"><button data-addgoal="${sc}">＋ লক্ষ্য যোগ</button> <span class="small">${bn(done)} / ${bn(o.goals.length)} সম্পন্ন</span></div>`;
+}
+function areasHTML(sc,o,a,b){
+  return `<label class="blab">${ed('al_'+sc+'_n',a)}</label><textarea data-scope="${sc}" data-path="notes">${esc(o.notes)}</textarea>
+    <label class="blab">${ed('al_'+sc+'_r',b)}</label><textarea data-scope="${sc}" data-path="review">${esc(o.review)}</textarea>`;
+}
+
+function dayStats(d){
+  const hs = state.cfg.habits, pr = d.pr||{}, hb = d.hb||{}, tk = Array.isArray(d.tasks)?d.tasks:[];
+  let total = PRAYERS.length + 1 + hs.length, done = 0, prayers = 0, habits = 0, tasks = 0, tdone = 0;
+  PRAYERS.forEach(([id])=>{ if(pr[id]){ done++; prayers++; } });
+  if(d.ex) done++;
+  hs.forEach(h=>{ if(hb[h.id]){ done++; habits++; } });
+  tk.forEach(t=>{ if((t.t||'').trim()){ total++; tasks++; if(t.d){ done++; tdone++; } } });
+  let pages = 0; Object.values(d.pages||{}).forEach(v=>{ pages += Number(v)||0; });
+  return {done,total,pct:total?Math.round(done/total*100):0,prayers,habits,tasks,tdone,ex:!!d.ex,exMin:Number(d.exMin)||0,pages,score:d.score||0};
+}
+function monthStats(y,m){
+  const n = new Date(y,m+1,0).getDate();
+  const r = {n,logged:0,sumPct:0,prayers:0,exDays:0,exMin:0,pages:0,tasks:0,tdone:0,scoreSum:0,scoreN:0,habit:{},cells:[]};
+  state.cfg.habits.forEach(h=>{ r.habit[h.id]=0; });
+  for(let i=1;i<=n;i++){
+    const k = key(new Date(y,m,i)), d = state.days[k]; let s = null;
+    if(d){ const x = dayStats(d); if(x.done>0 || x.tasks>0 || x.score>0) s = x; }
+    r.cells.push({k,i,s});
+    if(!s) continue;
+    r.logged++; r.sumPct += s.pct; r.prayers += s.prayers; if(s.ex) r.exDays++;
+    r.exMin += s.exMin; r.pages += s.pages; r.tasks += s.tasks; r.tdone += s.tdone;
+    if(s.score){ r.scoreSum += s.score; r.scoreN++; }
+    state.cfg.habits.forEach(h=>{ if(d.hb && d.hb[h.id]) r.habit[h.id]++; });
+  }
+  r.avg = r.logged ? Math.round(r.sumPct/r.logged) : 0;
+  r.avgScore = r.scoreN ? r.scoreSum/r.scoreN : 0;
+  return r;
+}
+function tile(label,val){ return `<div class="tile"><b>${val}</b><span>${label}</span></div>`; }
+
+function monthView(){
+  const y = cur.getFullYear(), m = cur.getMonth(), mo = mon(), s = monthStats(y,m);
+  const title = new Intl.DateTimeFormat('bn-BD',{month:'long',year:'numeric'}).format(cur);
+  const wd = [...Array(7)].map((_,i)=>`<div class="wd">${new Intl.DateTimeFormat('bn-BD',{weekday:'short'}).format(new Date(2023,0,7+i))}</div>`).join('');
+  const off = (new Date(y,m,1).getDay()+1)%7, today = key(new Date());
+  let cells = '<div class="cell blank"></div>'.repeat(off);
+  s.cells.forEach(c=>{
+    const p = c.s ? c.s.pct : 0;
+    cells += `<button class="cell ${c.s?'':'empty'} ${c.k===today?'today':''}" style="--p:${p};${p>55?'color:#fff':''}" data-go="${c.k}" title="${c.s?bn(p)+'%':'কোনো তথ্য নেই'}">${bn(c.i)}</button>`;
+  });
+  const hrows = state.cfg.habits.map(h=>{
+    const c = s.habit[h.id], p = s.logged ? Math.round(c/s.logged*100) : 0;
+    return `<div class="orow"><span class="ol">${esc(h.name)}</span><div class="bar"><i style="width:${p}%"></i></div><span class="small">${bn(c)}/${bn(s.logged)}</span></div>`;
+  }).join('');
+  const prRate = s.logged ? Math.round(s.prayers/(s.logged*PRAYERS.length)*100) : 0;
+  return `
+    <div class="card"><div class="datebar"><button data-mstep="-1">◀ আগের মাস</button><span class="big">${title}</span><button data-mstep="1">পরের মাস ▶</button></div></div>
+    <div class="card"><h2>${ed('h_mp','মাসিক প্ল্যান')}</h2>${goalsHTML('m',mo)}${areasHTML('m',mo,'পরিকল্পনা ও নোট','মাস শেষের রিভিউ')}</div>
+    <div class="card"><h2>${ed('h_mo','মাসিক ওভারভিউ')}</h2>
+      <div class="tiles">
+        ${tile('তথ্য দেওয়া দিন', bn(s.logged)+'/'+bn(s.n))}
+        ${tile('গড় অগ্রগতি', bn(s.avg)+'%')}
+        ${tile('নামাজ', bn(prRate)+'%')}
+        ${tile('ব্যায়ামের দিন', bn(s.exDays))}
+        ${tile('ব্যায়াম (মিনিট)', bn(s.exMin))}
+        ${tile('পড়া পৃষ্ঠা', bn(s.pages))}
+        ${tile('কাজ সম্পন্ন', bn(s.tdone)+'/'+bn(s.tasks))}
+        ${tile('গড় স্কোর', s.scoreN?bn(+s.avgScore.toFixed(1)):'–')}
+      </div>
+      <div class="cal">${wd}${cells}</div>
+      <div class="small">ঘরের রং যত গাঢ়, সেই দিনের অগ্রগতি তত বেশি। ঘরে ট্যাপ করলে সেই দিনে যাবেন।</div>
+      <div class="h3">${ed('h_mh','হ্যাবিট (কত দিন করা হয়েছে)')}</div>${hrows}
+    </div>`;
+}
+
+function yearView(){
+  const y = cur.getFullYear(), yo = yr();
+  const t = {logged:0,sumPct:0,exDays:0,exMin:0,pages:0,tasks:0,tdone:0,scoreSum:0,scoreN:0};
+  const rows = [...Array(12)].map((_,m)=>{
+    const s = monthStats(y,m);
+    t.logged+=s.logged; t.sumPct+=s.sumPct; t.exDays+=s.exDays; t.exMin+=s.exMin; t.pages+=s.pages;
+    t.tasks+=s.tasks; t.tdone+=s.tdone; t.scoreSum+=s.scoreSum; t.scoreN+=s.scoreN;
+    const nm = new Intl.DateTimeFormat('bn-BD',{month:'long'}).format(new Date(y,m,1));
+    return `<div class="orow"><button class="ol link" data-gom="${y}-${m}">${nm}</button><div class="bar"><i style="width:${s.avg}%"></i></div><span class="small">${bn(s.avg)}% · ${bn(s.logged)} দিন</span></div>`;
+  }).join('');
+  const avg = t.logged ? Math.round(t.sumPct/t.logged) : 0;
+  return `
+    <div class="card"><div class="datebar"><button data-ystep="-1">◀ আগের বছর</button><span class="big">${bn(y)}</span><button data-ystep="1">পরের বছর ▶</button></div></div>
+    <div class="card"><h2>${ed('h_yp','বার্ষিক প্ল্যান')}</h2>${goalsHTML('y',yo)}${areasHTML('y',yo,'বছরের থিম ও পরিকল্পনা','বছর শেষের রিভিউ')}</div>
+    <div class="card"><h2>${ed('h_yo','বার্ষিক ওভারভিউ')}</h2>
+      <div class="tiles">
+        ${tile('তথ্য দেওয়া দিন', bn(t.logged))}
+        ${tile('গড় অগ্রগতি', bn(avg)+'%')}
+        ${tile('ব্যায়ামের দিন', bn(t.exDays))}
+        ${tile('ব্যায়াম (মিনিট)', bn(t.exMin))}
+        ${tile('পড়া পৃষ্ঠা', bn(t.pages))}
+        ${tile('কাজ সম্পন্ন', bn(t.tdone)+'/'+bn(t.tasks))}
+        ${tile('গড় স্কোর', t.scoreN?bn(+(t.scoreSum/t.scoreN).toFixed(1)):'–')}
+      </div>
+      <div class="h3">${ed('h_ym','মাস অনুযায়ী গড় অগ্রগতি')}</div>${rows}
+      <div class="small">মাসের নামে ট্যাপ করলে সেই মাসের ওভারভিউ খুলবে।</div>
+    </div>`;
+}
+function renderPeriod(){
+  document.getElementById('app').innerHTML = `
+    <h1>${ed('title','আমার ডেইলি প্ল্যানার')}</h1>${tabs()}
+    ${view==='month'?monthView():yearView()}
+    <div class="card tools">
+      <button id="exp">⬇ ব্যাকআপ (JSON)</button>
+      <button id="imp">⬆ ব্যাকআপ লোড</button>
+      <input type="file" id="file" accept=".json" hidden>
+    </div>`;
+}
+
+function go(k){ cur = fromKey(k); setView('day'); render(); }
+
+const app = document.getElementById('app');
+
+app.addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.view){ setView(b.dataset.view); return render(); }
+  if(b.dataset.mstep){ cur = new Date(cur.getFullYear(), cur.getMonth()+Number(b.dataset.mstep), 1); return render(); }
+  if(b.dataset.ystep){ cur = new Date(cur.getFullYear()+Number(b.dataset.ystep), cur.getMonth(), 1); return render(); }
+  if(b.dataset.gom){ const [y,m] = b.dataset.gom.split('-').map(Number); cur = new Date(y,m,1); setView('month'); return render(); }
+  if(b.dataset.addgoal){ target(b.dataset.addgoal).goals.push({t:'',d:false}); save(); return render(); }
+  if(b.dataset.delgoal){ const [sc,i] = b.dataset.delgoal.split(':'); target(sc).goals.splice(Number(i),1); save(); return render(); }
+  if(b.dataset.go) return go(b.dataset.go);
+  if(b.dataset.step){ cur.setDate(cur.getDate()+Number(b.dataset.step)); return render(); }
+  if(b.dataset.score){ const d=day(); const v=Number(b.dataset.score); d.score = d.score===v?0:v; save(); return render(); }
+  if(b.dataset.del){
+    if(confirm('এই হ্যাবিটটি মুছে ফেলবেন?')){ state.cfg.habits = state.cfg.habits.filter(h=>h.id!==b.dataset.del); save(); render(); }
+    return;
+  }
+  if(b.id==='addHabit'){
+    const name = prompt('নতুন হ্যাবিটের নাম:'); if(!name || !name.trim()) return;
+    state.cfg.habits.push({id:'h'+Date.now(), name:name.trim(), pages:document.getElementById('newPages').checked});
+    save(); return render();
+  }
+  if(b.id==='exp'){
+    const blob = new Blob([JSON.stringify(state,null,1)],{type:'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'planner-backup-'+key(new Date())+'.json'; a.click(); return;
+  }
+  if(b.id==='imp') return document.getElementById('file').click();
+  if(b.id==='clr'){
+    if(confirm('আজকের দিনের সব তথ্য মুছে যাবে। নিশ্চিত?')){ delete state.days[key(cur)]; save(); render(); }
+  }
+});
+
+function onValue(e){
+  const el = e.target, p = el.dataset.path; if(!p) return;
+  const sc = el.dataset.scope;
+  setPath(target(sc), p, el.type==='checkbox' ? el.checked : el.value);
+  save();
+  if(!sc) progress();
+  else if(el.type==='checkbox' && e.type==='change') render();
+}
+app.addEventListener('input', onValue);
+app.addEventListener('change', e=>{
+  if(e.target.id==='picker' && e.target.value) return go(e.target.value);
+  if(e.target.id==='file'){
+    const f = e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = ()=>{ try{ const s=JSON.parse(r.result); if(!s.cfg||!s.days) throw 0; s.months??={}; s.years??={}; state=s; save(); render(); alert('ব্যাকআপ লোড হয়েছে।'); }catch(_){ alert('ফাইলটি সঠিক নয়।'); } };
+    r.readAsText(f); return;
+  }
+  onValue(e);
+});
+app.addEventListener('focusout', e=>{
+  const el = e.target;
+  if(el.dataset.label){
+    const v = el.textContent.trim();
+    if(v && v!==el.dataset.def) state.cfg.labels[el.dataset.label]=v; else delete state.cfg.labels[el.dataset.label];
+    if(!v) el.textContent = el.dataset.def;
+    save();
+  }
+  if(el.dataset.habit){
+    const h = state.cfg.habits.find(x=>x.id===el.dataset.habit);
+    const v = el.textContent.trim();
+    if(h && v){ h.name = v; save(); } else if(h){ el.textContent = h.name; }
+  }
+});
+app.addEventListener('keydown', e=>{ if(e.key==='Enter' && e.target.isContentEditable){ e.preventDefault(); e.target.blur(); } });
+
+render();
+</script>
+</body>
+</html>
